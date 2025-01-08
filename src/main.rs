@@ -1,96 +1,120 @@
 use colored::Colorize;
-use std::io;
-use Command::*;
+use std::io as lmao;
 use std::io::Write;
-use std::num::IntErrorKind;
-enum Command {
-    RemoveAt(usize),
-    Push(i64),
-}
 
 fn main() {
-    let mut list = vec![1];
-    println!("{}", "Type 1 to Remove an element at a specific index, 2 to push a number, and 3 to exit".blue().bold());
-    // Capture list by mutable reference to avoid ownership issues
-    let clos = |comm: Command, list: &mut Vec<i64>| match comm {
-        RemoveAt(x) => {
-            if x >= list.len() {
-                println!("{}", "Out of bounds".red().bold());
-                std::process::exit(0);
-            } else {
-                list.remove(x);
-            }
-        }
-        Push(a) => list.push(a),
-    };
-    loop {
-        let mut choice = String::new();
-        println!("\n{}{}", "The current contents are: ".blue().bold(),
-         format!("{:?}", list).cyan().bold());
-        print!("Enter your choice: ");
-        io::stdout().flush().unwrap();
-        io::stdin()
-            .read_line(&mut choice)
-            .expect("Invalid input\n Enter 1 to remove an element at an index, 2 to push a number, and 3 to exit");
-        match choice.as_str().trim() {
-            "1" => {
-                if list == vec![] {
-                    println!("{}", "The vector is empty!".red().bold());
-                    println!("{}", "Please add a number to the vector first".red().bold());
-                    continue;
-                }
-                print!("Enter index: ");
-                io::stdout().flush().unwrap();
-                let mut x = String::new();
-                io::stdin().read_line(&mut x).expect("Failed to read line");
-                let x: usize = match x.trim().parse() {
-                    Ok(x) => x,
-                    Err(e) => {
-                        eprintln!("\n{}", "There was an error".red().bold());
-                        eprintln!("{} {}", "Error:".red().bold(), e);
-                        continue;
-                    },
-                };
-                if x > list.len() {
-                    println!("{}", "There is not a number at that index!".red().bold());
-                    continue;
-                } else {
-                    clos(RemoveAt(x - 1), &mut list);
-                    continue;
-                }
-            }
+    let err_color_reg = (145, 0, 36);
+    let err_color_light = (255, 0, 63);
 
-            "2" => {
-                let mut a = String::new();
-                print!("\n{}", "Enter number to push: ".blue().bold());
-                io::stdout().flush().unwrap();
-                io::stdin().read_line(&mut a).expect("Failed to read input");
-                match a.trim().parse::<i64>() {
-                    Ok(a) => {
-                        clos(Push(a), &mut list);
-                        println!("{} {} {}", "Successfully added".green().bold(), a.to_string().green().bold(), "to the vector!".green().bold());
-                        continue;
-                    }
-                    Err(e) => {
-                        eprintln!("There was an error");
-                        if *e.kind() == IntErrorKind::NegOverflow || *e.kind() == IntErrorKind::PosOverflow {
-                            eprintln!("Err: {}", e); 
-                            eprintln!("Enter an integer from {} to {}", i64::MIN, i64::MAX);
-                        } else {
-                            eprintln!("Err: {}", e);
-                        }
-                        continue;
-                    }
-                };
-            }
-            "3" => {
+    print!("{}", "This is a calculator program".blue().bold());
+
+    loop {
+        println!("\n\n{}", "1. Addition".yellow());
+        println!("{}", "2. Subtraction".yellow());
+        println!("{}", "3. Multiplication".yellow());
+        println!("{}", "4. Division".yellow());
+        println!("{}\n", "5. Exit".yellow());
+
+        print!("{}", "Enter an operation: ".blue().bold());
+        lmao::stdout().flush().unwrap();
+
+        let mut choice = String::new();
+        lmao::stdin()
+            .read_line(&mut choice)
+            .expect("There was an error reading input!");
+
+        match choice.trim() {
+            "5" => {
                 println!("{}", "Farewell!".green().bold());
                 std::process::exit(0);
             }
+            "1" | "2" | "3" | "4" => {
+            }
             _ => {
-                println!("{}", "You didn't enter a valid choice!".red().bold());
+                println!(
+                    "{}\n{}",
+                    "Invalid choice!".red().bold(),
+                    "Please enter 1, 2, 3, 4, or 5."
+                );
+                continue;
+            }
+        }
+
+        let mut x = String::new();
+        let mut y = String::new();
+
+        print!("Enter the first number: ");
+        lmao::stdout().flush().unwrap();
+        lmao::stdin()
+            .read_line(&mut x)
+            .expect("There was an error reading input!");
+
+        let x: i64 = match x.trim().parse() {
+            Ok(num) => num,
+            Err(e) => {
+                eprintln!(
+                    "{} {}",
+                    "There has been an error:"
+                        .truecolor(err_color_reg.0, err_color_reg.1, err_color_reg.2)
+                        .bold(),
+                    format!("{e}")
+                        .truecolor(err_color_light.0, err_color_light.1, err_color_light.2)
+                        .bold()
+                );
                 continue;
             }
         };
+
+        print!("Enter the second number: ");
+        lmao::stdout().flush().unwrap();
+        lmao::stdin()
+            .read_line(&mut y)
+            .expect("There was an error reading input!");
+
+        let y: i64 = match y.trim().parse() {
+            Ok(num) => num,
+            Err(e) => {
+                eprintln!(
+                    "{} {}",
+                    "There has been an error:"
+                        .truecolor(err_color_reg.0, err_color_reg.1, err_color_reg.2)
+                        .bold(),
+                    format!("{e}")
+                        .truecolor(err_color_light.0, err_color_light.1, err_color_light.2)
+                        .bold()
+                );
+                continue;
+            }
+        };
+
+        match choice.trim() {
+            "1" => println!(
+                "{}{}\n",
+                "The sum is: ".blue().bold(),
+                (x + y).to_string().bright_blue().bold()
+            ),
+            "2" => println!(
+                "{}{}\n",
+                "The difference is: ".blue().bold(),
+                (x - y).to_string().bright_blue().bold()
+            ),
+            "3" => println!(
+                "{}{}\n",
+                "The product is: ".blue().bold(),
+                (x * y).to_string().bright_blue().bold()
+            ),
+            "4" => {
+                if y == 0 {
+                    println!("{}", "Error: Division by zero is not allowed!".red().bold());
+                } else {
+                    println!(
+                        "{}{}\n",
+                        "The quotient is: ".blue().bold(),
+                        (x / y).to_string().bright_blue().bold()
+                    );
+                }
+            }
+            _ => {}
+        }
     }
 }
